@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Entity, Match } from "@/lib/types";
 import { seedEntities } from "@/lib/data/seed-entities";
 import { buildExplanation } from "@/lib/matching/explain";
-import { Eye, ArrowRight, CheckCircle2, Clock, AlertCircle } from "lucide-react";
+import { Eye, ArrowRight, CheckCircle2, Clock, AlertCircle, TrendingUp, Users, Building2, Network } from "lucide-react";
 
 type QueueItem = {
   intake: Entity;
@@ -39,44 +39,91 @@ export default function StaffPage() {
     setQueue(items);
   }, []);
 
+  const highConfidence = queue.filter((q) => q.topMatch && q.topMatch.score >= 65).length;
+  const needsReview = queue.filter((q) => q.topMatch && q.topMatch.score >= 40 && q.topMatch.score < 65).length;
+  const lowConfidence = queue.filter((q) => !q.topMatch || q.topMatch.score < 40).length;
+
   function statusBadge(topMatch: QueueItem["topMatch"]) {
-    if (!topMatch) return { label: "New", color: "bg-[#5a5a5c]/10 text-[#5a5a5c]" };
-    if (topMatch.score >= 75) return { label: "AI Matched", color: "bg-[#0d9f6e]/10 text-[#0d9f6e]" };
-    if (topMatch.score >= 50) return { label: "Needs Review", color: "bg-[#d49400]/10 text-[#d49400]" };
-    return { label: "Low Confidence", color: "bg-[#dc2626]/10 text-[#dc2626]" };
+    if (!topMatch) return { label: "New", color: "bg-gray-100 text-gray-600 border-gray-200", icon: AlertCircle };
+    if (topMatch.score >= 65) return { label: "AI Matched", color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle2 };
+    if (topMatch.score >= 40) return { label: "Needs Review", color: "bg-amber-50 text-amber-700 border-amber-200", icon: Clock };
+    return { label: "Low Confidence", color: "bg-red-50 text-red-700 border-red-200", icon: AlertCircle };
   }
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-[#1c1c1d]">Staff Queue</h1>
-        <p className="mt-2 text-[#5a5a5c]">Review AI recommendations and approve introductions.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-[#1c1c1d] md:text-4xl">Staff Queue</h1>
+        <p className="mt-2 text-[#5a5a5c] text-lg">Review AI recommendations and approve introductions.</p>
+      </div>
+
+      {/* Summary Banner */}
+      <div className="mb-8 grid gap-4 sm:grid-cols-4">
+        <div className="rounded-xl bg-white border border-[#dce6f0] p-5 shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#8a8a8c]">
+            <Users className="h-4 w-4" /> Total Intakes
+          </div>
+          <div className="mt-2 text-3xl font-bold text-[#1c1c1d]">{queue.length}</div>
+        </div>
+        <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-5">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-emerald-600">
+            <CheckCircle2 className="h-4 w-4" /> High Confidence
+          </div>
+          <div className="mt-2 text-3xl font-bold text-emerald-700">{highConfidence}</div>
+          <div className="mt-1 text-xs text-emerald-600">Ready for approval</div>
+        </div>
+        <div className="rounded-xl bg-amber-50 border border-amber-200 p-5">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-600">
+            <Clock className="h-4 w-4" /> Needs Review
+          </div>
+          <div className="mt-2 text-3xl font-bold text-amber-700">{needsReview}</div>
+          <div className="mt-1 text-xs text-amber-600">Check before introducing</div>
+        </div>
+        <div className="rounded-xl bg-red-50 border border-red-200 p-5">
+          <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-red-600">
+            <AlertCircle className="h-4 w-4" /> Low Confidence
+          </div>
+          <div className="mt-2 text-3xl font-bold text-red-700">{lowConfidence}</div>
+          <div className="mt-1 text-xs text-red-600">Request more info</div>
+        </div>
       </div>
 
       <div className="grid gap-4">
         {queue.map((item) => {
           const s = statusBadge(item.topMatch);
           const detailId = `${item.intake.id}--${item.topMatch?.targetEntityId || "none"}`;
+          const targetName = item.topMatch
+            ? seedEntities.find((e) => e.id === item.topMatch!.targetEntityId)?.name
+            : null;
           return (
-            <div key={item.intake.id} className="flex flex-col gap-4 rounded-2xl border border-[#dce6f0] bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <div
+              key={item.intake.id}
+              className="flex flex-col gap-4 rounded-2xl border border-[#dce6f0] bg-white p-5 shadow-sm transition hover:shadow-md hover:-translate-y-0.5 sm:flex-row sm:items-center sm:justify-between"
+            >
               <div className="flex items-start gap-3">
                 <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-[#0048bd]/5">
-                  {s.label === "AI Matched" ? <CheckCircle2 className="h-5 w-5 text-[#0d9f6e]" /> : s.label === "Needs Review" ? <Clock className="h-5 w-5 text-[#d49400]" /> : <AlertCircle className="h-5 w-5 text-[#5a5a5c]" />}
+                  <s.icon className={`h-5 w-5 ${s.color.includes("emerald") ? "text-emerald-600" : s.color.includes("amber") ? "text-amber-600" : s.color.includes("red") ? "text-red-600" : "text-[#5a5a5c]"}`} />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-semibold text-[#1c1c1d]">{item.intake.name}</span>
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${s.color}`}>{s.label}</span>
+                    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold border ${s.color}`}>
+                      {s.label}
+                    </span>
                   </div>
-                  <div className="mt-1 text-sm text-[#5a5a5c]">{item.intake.headline || item.intake.summary.slice(0, 100)}</div>
+                  <div className="mt-1 text-sm text-[#5a5a5c]">
+                    {item.intake.headline || item.intake.summary.slice(0, 100)}
+                  </div>
                   {item.topMatch && (
                     <div className="mt-2 text-sm text-[#5a5a5c]">
                       Top match:{" "}
-                      <span className="font-medium text-[#1c1c1d]">
-                        {seedEntities.find((e) => e.id === item.topMatch!.targetEntityId)?.name}
+                      <span className="font-medium text-[#1c1c1d]">{targetName}</span>
+                      {" "}• Score:{" "}
+                      <span className={`font-bold ${item.topMatch.score >= 65 ? "text-emerald-600" : item.topMatch.score >= 40 ? "text-amber-600" : "text-red-600"}`}>
+                        {item.topMatch.score}
                       </span>
-                      {" "}• Score: {" "}
-                      <span className="font-bold text-[#0048bd]">{item.topMatch.score}</span>
+                      {" "}•{" "}
+                      <span className="capitalize font-medium">{item.topMatch.confidence}</span>
                     </div>
                   )}
                 </div>
@@ -84,7 +131,7 @@ export default function StaffPage() {
 
               <Link
                 href={`/staff/matches/${detailId}`}
-                className="inline-flex items-center gap-2 rounded-xl border border-[#dce6f0] bg-white px-4 py-2 text-sm font-semibold text-[#1c1c1d] transition hover:bg-[#f4fafe]"
+                className="inline-flex items-center gap-2 rounded-xl border border-[#dce6f0] bg-white px-4 py-2 text-sm font-semibold text-[#1c1c1d] transition hover:bg-[#f4fafe] hover:scale-[1.02]"
               >
                 <Eye className="h-4 w-4" />
                 Review
