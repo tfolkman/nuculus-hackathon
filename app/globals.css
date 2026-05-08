@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f9fb;
-  --foreground: #0f172a;
+  --background: #f4fafe;
+  --foreground: #1c1c1d;
   --card: #ffffff;
-  --card-foreground: #0f172a;
-  --primary: #1e3a5f;
+  --card-foreground: #1c1c1d;
+  --primary: #0048bd;
   --primary-foreground: #ffffff;
-  --accent: #06b6d4;
+  --accent: #00a3e0;
   --accent-foreground: #ffffff;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --border: #e2e8f0;
+  --muted: #eef6fc;
+  --muted-foreground: #5a5a5c;
+  --border: #dce6f0;
   --radius: 0.75rem;
 }
 
@@ -27,21 +27,20 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-border: var(--border);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-manrope);
 
-  --color-nucleus: #1e3a5f;
-  --color-nucleus-light: #2d4a6f;
-  --color-electric: #06b6d4;
-  --color-sage: #10b981;
-  --color-amber-badge: #f59e0b;
-  --color-cream: #f8f9fb;
+  --color-nucleus: #0048bd;
+  --color-nucleus-light: #0066e0;
+  --color-electric: #00a3e0;
+  --color-sage: #0d9f6e;
+  --color-amber-badge: #d49400;
+  --color-cream: #f4fafe;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-manrope), system-ui, sans-serif;
 }
 
 /* Utilities */

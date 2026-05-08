@@ -43,8 +43,8 @@ export default function MatchDetailPage() {
   if (!source || !target || !match) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-16 text-center">
-        <p className="text-[#64748b]">Match not found.</p>
-        <Link href="/staff" className="mt-4 inline-block rounded-xl bg-[#1e3a5f] px-5 py-2.5 text-sm font-semibold text-white">
+        <p className="text-[#5a5a5c]">Match not found.</p>
+        <Link href="/staff" className="mt-4 inline-block rounded-xl bg-[#0048bd] px-5 py-2.5 text-sm font-semibold text-white">
           Back to Queue
         </Link>
       </div>
@@ -66,53 +66,53 @@ export default function MatchDetailPage() {
 
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
-      <Link href="/staff" className="inline-flex items-center gap-1 text-sm text-[#64748b] hover:text-[#1e3a5f]">
+      <Link href="/staff" className="inline-flex items-center gap-1 text-sm text-[#5a5a5c] hover:text-[#0048bd]">
         <ArrowLeft className="h-4 w-4" /> Back to queue
       </Link>
 
       <div className="mt-6 flex flex-col gap-6 md:flex-row">
         {/* Source card */}
-        <div className="flex-1 rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
-          <div className="text-xs font-semibold uppercase tracking-wide text-[#94a3b8]">Source intake</div>
-          <div className="mt-2 text-xl font-bold text-[#0f172a]">{source.name}</div>
-          <div className="mt-1 text-sm text-[#64748b]">{source.headline}</div>
+        <div className="flex-1 rounded-2xl border border-[#dce6f0] bg-white p-6 shadow-sm">
+          <div className="text-xs font-semibold uppercase tracking-wide text-[#8a8a8c]">Source intake</div>
+          <div className="mt-2 text-xl font-bold text-[#1c1c1d]">{source.name}</div>
+          <div className="mt-1 text-sm text-[#5a5a5c]">{source.headline}</div>
           <div className="mt-4 flex flex-wrap gap-2">
             {source.sectors.map((s) => (
-              <span key={s} className="rounded-full bg-[#f1f5f9] px-2.5 py-1 text-xs font-medium text-[#64748b]">
+              <span key={s} className="rounded-full bg-[#eef6fc] px-2.5 py-1 text-xs font-medium text-[#5a5a5c]">
                 {s}
               </span>
             ))}
           </div>
-          <div className="mt-3 text-sm text-[#64748b]">{source.summary}</div>
+          <div className="mt-3 text-sm text-[#5a5a5c]">{source.summary}</div>
         </div>
 
         {/* Target card */}
-        <div className="flex-1 rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
-          <div className="text-xs font-semibold uppercase tracking-wide text-[#94a3b8]">Recommended match</div>
-          <div className="mt-2 text-xl font-bold text-[#0f172a]">{target.name}</div>
-          <div className="mt-1 text-sm text-[#64748b]">{target.headline}</div>
+        <div className="flex-1 rounded-2xl border border-[#dce6f0] bg-white p-6 shadow-sm">
+          <div className="text-xs font-semibold uppercase tracking-wide text-[#8a8a8c]">Recommended match</div>
+          <div className="mt-2 text-xl font-bold text-[#1c1c1d]">{target.name}</div>
+          <div className="mt-1 text-sm text-[#5a5a5c]">{target.headline}</div>
           <div className="mt-4 flex flex-wrap gap-2">
             {target.sectors.map((s) => (
-              <span key={s} className="rounded-full bg-[#f1f5f9] px-2.5 py-1 text-xs font-medium text-[#64748b]">
+              <span key={s} className="rounded-full bg-[#eef6fc] px-2.5 py-1 text-xs font-medium text-[#5a5a5c]">
                 {s}
               </span>
             ))}
           </div>
-          <div className="mt-3 text-sm text-[#64748b]">{target.summary}</div>
+          <div className="mt-3 text-sm text-[#5a5a5c]">{target.summary}</div>
         </div>
       </div>
 
       {/* Score */}
-      <div className="mt-6 rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
+      <div className="mt-6 rounded-2xl border border-[#dce6f0] bg-white p-6 shadow-sm">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-sm font-semibold text-[#0f172a]">Match Score</div>
-            <div className="mt-1 text-4xl font-bold text-[#1e3a5f]">{match.score}</div>
-            <div className="mt-1 text-sm text-[#64748b]">Confidence: <span className="font-medium text-[#0f172a]">{match.confidence}</span></div>
+            <div className="text-sm font-semibold text-[#1c1c1d]">Match Score</div>
+            <div className="mt-1 text-4xl font-bold text-[#0048bd]">{match.score}</div>
+            <div className="mt-1 text-sm text-[#5a5a5c]">Confidence: <span className="font-medium text-[#1c1c1d]">{match.confidence}</span></div>
           </div>
           <div className="text-right">
-            <div className="text-sm font-semibold text-[#0f172a]">Status</div>
-            <div className="mt-1 inline-block rounded-full bg-[#f1f5f9] px-3 py-1 text-sm font-medium text-[#0f172a] capitalize">
+            <div className="text-sm font-semibold text-[#1c1c1d]">Status</div>
+            <div className="mt-1 inline-block rounded-full bg-[#eef6fc] px-3 py-1 text-sm font-medium text-[#1c1c1d] capitalize">
               {matchStatus}
             </div>
           </div>
@@ -121,23 +121,23 @@ export default function MatchDetailPage() {
 
       {/* Reasons + Evidence */}
       <div className="mt-6 grid gap-6 md:grid-cols-2">
-        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
-          <div className="text-sm font-semibold text-[#0f172a]">Why this match</div>
+        <div className="rounded-2xl border border-[#dce6f0] bg-white p-6 shadow-sm">
+          <div className="text-sm font-semibold text-[#1c1c1d]">Why this match</div>
           <ul className="mt-4 space-y-3">
             {match.reasons.map((r) => (
-              <li key={r.label} className="flex items-start gap-2 text-sm text-[#64748b]">
-                <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#10b981]" />
-                <span><span className="font-medium text-[#0f172a]">{r.label}:</span> {r.detail}</span>
+              <li key={r.label} className="flex items-start gap-2 text-sm text-[#5a5a5c]">
+                <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-[#0d9f6e]" />
+                <span><span className="font-medium text-[#1c1c1d]">{r.label}:</span> {r.detail}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
-          <div className="text-sm font-semibold text-[#0f172a]">Evidence</div>
+        <div className="rounded-2xl border border-[#dce6f0] bg-white p-6 shadow-sm">
+          <div className="text-sm font-semibold text-[#1c1c1d]">Evidence</div>
           <div className="mt-4 flex flex-wrap gap-2">
             {match.evidence.map((e) => (
-              <span key={`${e.field}-${e.value}`} className="rounded-full bg-[#06b6d4]/10 px-2.5 py-1 text-xs font-medium text-[#06b6d4]">
+              <span key={`${e.field}-${e.value}`} className="rounded-full bg-[#00a3e0]/10 px-2.5 py-1 text-xs font-medium text-[#00a3e0]">
                 {e.field}: {e.value}
               </span>
             ))}
@@ -146,33 +146,33 @@ export default function MatchDetailPage() {
       </div>
 
       {/* Intro + Actions */}
-      <div className="mt-6 rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
-        <div className="text-sm font-semibold text-[#0f172a]">Suggested Intro Email</div>
+      <div className="mt-6 rounded-2xl border border-[#dce6f0] bg-white p-6 shadow-sm">
+        <div className="text-sm font-semibold text-[#1c1c1d]">Suggested Intro Email</div>
         <textarea
-          className="mt-3 block w-full rounded-xl border border-[#e2e8f0] bg-[#f8f9fb] px-4 py-3 text-sm text-[#0f172a] outline-none focus:ring-2 ring-[#06b6d4]"
+          className="mt-3 block w-full rounded-xl border border-[#dce6f0] bg-[#f4fafe] px-4 py-3 text-sm text-[#1c1c1d] outline-none focus:ring-2 ring-[#00a3e0]"
           rows={8}
           defaultValue={match.suggestedIntro}
         />
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <button onClick={handleApprove} className="inline-flex items-center gap-2 rounded-xl bg-[#10b981] px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-[#059669]">
+          <button onClick={handleApprove} className="inline-flex items-center gap-2 rounded-xl bg-[#0d9f6e] px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-[#059669]">
             <CheckCircle className="h-4 w-4" /> Approve
           </button>
-          <button onClick={handleHold} className="inline-flex items-center gap-2 rounded-xl border border-[#e2e8f0] bg-white px-5 py-2.5 text-sm font-semibold text-[#0f172a] hover:bg-[#f8f9fb]">
+          <button onClick={handleHold} className="inline-flex items-center gap-2 rounded-xl border border-[#dce6f0] bg-white px-5 py-2.5 text-sm font-semibold text-[#1c1c1d] hover:bg-[#f4fafe]">
             <PauseCircle className="h-4 w-4" /> Hold
           </button>
-          <button onClick={handleReject} className="inline-flex items-center gap-2 rounded-xl border border-[#e2e8f0] bg-white px-5 py-2.5 text-sm font-semibold text-[#ef4444] hover:bg-[#fef2f2]">
+          <button onClick={handleReject} className="inline-flex items-center gap-2 rounded-xl border border-[#dce6f0] bg-white px-5 py-2.5 text-sm font-semibold text-[#dc2626] hover:bg-[#fef2f2]">
             <XCircle className="h-4 w-4" /> Reject
           </button>
         </div>
       </div>
 
       {/* Affinity sync */}
-      <div className="mt-6 rounded-2xl border border-[#e2e8f0] bg-white p-6 shadow-sm">
-        <div className="flex items-center gap-2 text-sm font-semibold text-[#0f172a]">
-          <Database className="h-4 w-4 text-[#64748b]" /> Affinity CRM Sync
+      <div className="mt-6 rounded-2xl border border-[#dce6f0] bg-white p-6 shadow-sm">
+        <div className="flex items-center gap-2 text-sm font-semibold text-[#1c1c1d]">
+          <Database className="h-4 w-4 text-[#5a5a5c]" /> Affinity CRM Sync
         </div>
-        <div className="mt-3 rounded-xl bg-[#0f172a] p-4 font-mono text-xs text-[#e2e8f0] overflow-x-auto">
+        <div className="mt-3 rounded-xl bg-[#1c1c1d] p-4 font-mono text-xs text-[#dce6f0] overflow-x-auto">
           <pre>{JSON.stringify({
             person: source.name,
             org: target.type === "startup" ? target.name : undefined,
@@ -187,7 +187,7 @@ export default function MatchDetailPage() {
             note: match.suggestedIntro,
           }, null, 2)}</pre>
         </div>
-        <div className="mt-3 text-sm text-[#64748b]">Sync status: <span className="font-medium text-[#0f172a] capitalize">{syncStatus.replace("_", " ")}</span></div>
+        <div className="mt-3 text-sm text-[#5a5a5c]">Sync status: <span className="font-medium text-[#1c1c1d] capitalize">{syncStatus.replace("_", " ")}</span></div>
       </div>
     </div>
   );

@@ -57,7 +57,7 @@ export default function MatchesPage() {
 
   if (!loaded) {
     return (
-      <div className="flex h-64 items-center justify-center text-[#64748b]">
+      <div className="flex h-64 items-center justify-center text-[#5a5a5c]">
         Loading matches...
       </div>
     );
@@ -66,9 +66,9 @@ export default function MatchesPage() {
   if (!source) {
     return (
       <div className="mx-auto max-w-3xl px-6 py-16 text-center">
-        <h1 className="text-2xl font-bold text-[#0f172a]">No intake found</h1>
-        <p className="mt-2 text-[#64748b]">Please complete the intake first.</p>
-        <Link href="/intake" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#1e3a5f] px-5 py-2.5 text-sm font-semibold text-white">
+        <h1 className="text-2xl font-bold text-[#1c1c1d]">No intake found</h1>
+        <p className="mt-2 text-[#5a5a5c]">Please complete the intake first.</p>
+        <Link href="/intake" className="mt-6 inline-flex items-center gap-2 rounded-xl bg-[#0048bd] px-5 py-2.5 text-sm font-semibold text-white">
           Go to Intake
         </Link>
       </div>
@@ -78,11 +78,11 @@ export default function MatchesPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-10">
       <div className="mb-8">
-        <Link href="/intake" className="inline-flex items-center gap-1 text-sm text-[#64748b] hover:text-[#1e3a5f]">
+        <Link href="/intake" className="inline-flex items-center gap-1 text-sm text-[#5a5a5c] hover:text-[#0048bd]">
           <ArrowLeft className="h-4 w-4" /> Back to intake
         </Link>
-        <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#0f172a]">Top Matches for {source.name}</h1>
-        <p className="mt-2 text-[#64748b]">Ranked by hybrid AI score with transparent explanations.</p>
+        <h1 className="mt-3 text-3xl font-bold tracking-tight text-[#1c1c1d]">Top Matches for {source.name}</h1>
+        <p className="mt-2 text-[#5a5a5c]">Ranked by hybrid AI score with transparent explanations.</p>
       </div>
 
       <div className="grid gap-6">
@@ -91,67 +91,67 @@ export default function MatchesPage() {
           const isOpen = openMatch === m.targetEntityId;
           const confidenceColor =
             m.confidence === "high"
-              ? "bg-[#10b981]/10 text-[#10b981]"
+              ? "bg-[#0d9f6e]/10 text-[#0d9f6e]"
               : m.confidence === "medium"
-              ? "bg-[#f59e0b]/10 text-[#f59e0b]"
-              : "bg-[#ef4444]/10 text-[#ef4444]";
+              ? "bg-[#d49400]/10 text-[#d49400]"
+              : "bg-[#dc2626]/10 text-[#dc2626]";
 
           return (
-            <div key={m.targetEntityId} className="rounded-2xl border border-[#e2e8f0] bg-white shadow-sm">
+            <div key={m.targetEntityId} className="rounded-2xl border border-[#dce6f0] bg-white shadow-sm">
               <button
                 onClick={() => setOpenMatch(isOpen ? null : m.targetEntityId)}
                 className="flex w-full items-center justify-between px-6 py-5 text-left"
               >
                 <div className="flex items-center gap-4">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f1f5f9] font-bold text-[#1e3a5f]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eef6fc] font-bold text-[#0048bd]">
                     {i + 1}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-base font-semibold text-[#0f172a]">{target.name}</span>
-                      <span className="rounded-full bg-[#f1f5f9] px-2 py-0.5 text-xs font-medium text-[#64748b]">
+                      <span className="text-base font-semibold text-[#1c1c1d]">{target.name}</span>
+                      <span className="rounded-full bg-[#eef6fc] px-2 py-0.5 text-xs font-medium text-[#5a5a5c]">
                         {target.type}
                       </span>
                     </div>
-                    <div className="mt-0.5 text-sm text-[#64748b]">{target.headline}</div>
+                    <div className="mt-0.5 text-sm text-[#5a5a5c]">{target.headline}</div>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-4">
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-[#1e3a5f]">{m.score}</div>
+                    <div className="text-2xl font-bold text-[#0048bd]">{m.score}</div>
                     <div className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${confidenceColor}`}>
                       {m.confidence} confidence
                     </div>
                   </div>
-                  {isOpen ? <ChevronUp className="h-5 w-5 text-[#64748b]" /> : <ChevronDown className="h-5 w-5 text-[#64748b]" />}
+                  {isOpen ? <ChevronUp className="h-5 w-5 text-[#5a5a5c]" /> : <ChevronDown className="h-5 w-5 text-[#5a5a5c]" />}
                 </div>
               </button>
 
               {isOpen && (
-                <div className="border-t border-[#e2e8f0] px-6 py-5">
+                <div className="border-t border-[#dce6f0] px-6 py-5">
                   <div className="grid gap-6 md:grid-cols-2">
                     <div className="space-y-4">
                       <div>
-                        <div className="flex items-center gap-2 text-sm font-semibold text-[#0f172a]">
-                          <CheckCircle className="h-4 w-4 text-[#10b981]" /> Why this match
+                        <div className="flex items-center gap-2 text-sm font-semibold text-[#1c1c1d]">
+                          <CheckCircle className="h-4 w-4 text-[#0d9f6e]" /> Why this match
                         </div>
                         <ul className="mt-2 space-y-2">
                           {m.reasons.map((r) => (
-                            <li key={r.label} className="text-sm text-[#64748b]">
-                              <span className="font-medium text-[#0f172a]">{r.label}:</span> {r.detail}
+                            <li key={r.label} className="text-sm text-[#5a5a5c]">
+                              <span className="font-medium text-[#1c1c1d]">{r.label}:</span> {r.detail}
                             </li>
                           ))}
                         </ul>
                       </div>
 
                       <div>
-                        <div className="flex items-center gap-2 text-sm font-semibold text-[#0f172a]">
-                          <Info className="h-4 w-4 text-[#06b6d4]" /> Evidence
+                        <div className="flex items-center gap-2 text-sm font-semibold text-[#1c1c1d]">
+                          <Info className="h-4 w-4 text-[#00a3e0]" /> Evidence
                         </div>
                         <div className="mt-2 flex flex-wrap gap-2">
                           {m.evidence.map((e) => (
-                            <span key={e.field} className="rounded-full bg-[#06b6d4]/10 px-2.5 py-1 text-xs font-medium text-[#06b6d4]">
+                            <span key={e.field} className="rounded-full bg-[#00a3e0]/10 px-2.5 py-1 text-xs font-medium text-[#00a3e0]">
                               {e.field}: {e.value}
                             </span>
                           ))}
@@ -162,27 +162,27 @@ export default function MatchesPage() {
                     <div className="space-y-4">
                       {m.gaps.length > 0 && (
                         <div>
-                          <div className="flex items-center gap-2 text-sm font-semibold text-[#0f172a]">
-                            <AlertTriangle className="h-4 w-4 text-[#f59e0b]" /> Gaps & Risks
+                          <div className="flex items-center gap-2 text-sm font-semibold text-[#1c1c1d]">
+                            <AlertTriangle className="h-4 w-4 text-[#d49400]" /> Gaps & Risks
                           </div>
                           <ul className="mt-2 space-y-2">
                             {m.gaps.map((g) => (
-                              <li key={g.label} className="text-sm text-[#64748b]">
-                                <span className="font-medium text-[#0f172a]">{g.label}:</span> {g.detail}
+                              <li key={g.label} className="text-sm text-[#5a5a5c]">
+                                <span className="font-medium text-[#1c1c1d]">{g.label}:</span> {g.detail}
                               </li>
                             ))}
                           </ul>
                         </div>
                       )}
 
-                      <div className="rounded-xl bg-[#f8f9fb] p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-[#94a3b8]">Suggested next action</div>
-                        <div className="mt-1 text-sm font-medium text-[#0f172a]">{m.nextBestAction}</div>
+                      <div className="rounded-xl bg-[#f4fafe] p-4">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-[#8a8a8c]">Suggested next action</div>
+                        <div className="mt-1 text-sm font-medium text-[#1c1c1d]">{m.nextBestAction}</div>
                       </div>
 
                       <Link
                         href={`/staff/matches/${m.sourceEntityId}--${m.targetEntityId}`}
-                        className="inline-flex items-center gap-2 rounded-xl border border-[#1e3a5f] px-4 py-2.5 text-sm font-semibold text-[#1e3a5f] transition hover:bg-[#1e3a5f] hover:text-white"
+                        className="inline-flex items-center gap-2 rounded-xl border border-[#0048bd] px-4 py-2.5 text-sm font-semibold text-[#0048bd] transition hover:bg-[#0048bd] hover:text-white"
                       >
                         <Users className="h-4 w-4" />
                         Review in staff queue

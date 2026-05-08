@@ -40,17 +40,17 @@ export default function StaffPage() {
   }, []);
 
   function statusBadge(topMatch: QueueItem["topMatch"]) {
-    if (!topMatch) return { label: "New", color: "bg-[#64748b]/10 text-[#64748b]" };
-    if (topMatch.score >= 75) return { label: "AI Matched", color: "bg-[#10b981]/10 text-[#10b981]" };
-    if (topMatch.score >= 50) return { label: "Needs Review", color: "bg-[#f59e0b]/10 text-[#f59e0b]" };
-    return { label: "Low Confidence", color: "bg-[#ef4444]/10 text-[#ef4444]" };
+    if (!topMatch) return { label: "New", color: "bg-[#5a5a5c]/10 text-[#5a5a5c]" };
+    if (topMatch.score >= 75) return { label: "AI Matched", color: "bg-[#0d9f6e]/10 text-[#0d9f6e]" };
+    if (topMatch.score >= 50) return { label: "Needs Review", color: "bg-[#d49400]/10 text-[#d49400]" };
+    return { label: "Low Confidence", color: "bg-[#dc2626]/10 text-[#dc2626]" };
   }
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-[#0f172a]">Staff Queue</h1>
-        <p className="mt-2 text-[#64748b]">Review AI recommendations and approve introductions.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-[#1c1c1d]">Staff Queue</h1>
+        <p className="mt-2 text-[#5a5a5c]">Review AI recommendations and approve introductions.</p>
       </div>
 
       <div className="grid gap-4">
@@ -58,25 +58,25 @@ export default function StaffPage() {
           const s = statusBadge(item.topMatch);
           const detailId = `${item.intake.id}--${item.topMatch?.targetEntityId || "none"}`;
           return (
-            <div key={item.intake.id} className="flex flex-col gap-4 rounded-2xl border border-[#e2e8f0] bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+            <div key={item.intake.id} className="flex flex-col gap-4 rounded-2xl border border-[#dce6f0] bg-white p-5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-[#1e3a5f]/5">
-                  {s.label === "AI Matched" ? <CheckCircle2 className="h-5 w-5 text-[#10b981]" /> : s.label === "Needs Review" ? <Clock className="h-5 w-5 text-[#f59e0b]" /> : <AlertCircle className="h-5 w-5 text-[#64748b]" />}
+                <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-[#0048bd]/5">
+                  {s.label === "AI Matched" ? <CheckCircle2 className="h-5 w-5 text-[#0d9f6e]" /> : s.label === "Needs Review" ? <Clock className="h-5 w-5 text-[#d49400]" /> : <AlertCircle className="h-5 w-5 text-[#5a5a5c]" />}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-[#0f172a]">{item.intake.name}</span>
+                    <span className="font-semibold text-[#1c1c1d]">{item.intake.name}</span>
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${s.color}`}>{s.label}</span>
                   </div>
-                  <div className="mt-1 text-sm text-[#64748b]">{item.intake.headline || item.intake.summary.slice(0, 100)}</div>
+                  <div className="mt-1 text-sm text-[#5a5a5c]">{item.intake.headline || item.intake.summary.slice(0, 100)}</div>
                   {item.topMatch && (
-                    <div className="mt-2 text-sm text-[#64748b]">
+                    <div className="mt-2 text-sm text-[#5a5a5c]">
                       Top match:{" "}
-                      <span className="font-medium text-[#0f172a]">
+                      <span className="font-medium text-[#1c1c1d]">
                         {seedEntities.find((e) => e.id === item.topMatch!.targetEntityId)?.name}
                       </span>
                       {" "}• Score: {" "}
-                      <span className="font-bold text-[#1e3a5f]">{item.topMatch.score}</span>
+                      <span className="font-bold text-[#0048bd]">{item.topMatch.score}</span>
                     </div>
                   )}
                 </div>
@@ -84,7 +84,7 @@ export default function StaffPage() {
 
               <Link
                 href={`/staff/matches/${detailId}`}
-                className="inline-flex items-center gap-2 rounded-xl border border-[#e2e8f0] bg-white px-4 py-2 text-sm font-semibold text-[#0f172a] transition hover:bg-[#f8f9fb]"
+                className="inline-flex items-center gap-2 rounded-xl border border-[#dce6f0] bg-white px-4 py-2 text-sm font-semibold text-[#1c1c1d] transition hover:bg-[#f4fafe]"
               >
                 <Eye className="h-4 w-4" />
                 Review

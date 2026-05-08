@@ -79,8 +79,8 @@ export default function IntakePage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-16">
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-[#0f172a]">Find Your Connection</h1>
-        <p className="mt-2 text-[#64748b]">Describe what you need. AI extracts signals and ranks matches.</p>
+        <h1 className="text-3xl font-bold tracking-tight text-[#1c1c1d]">Find Your Connection</h1>
+        <p className="mt-2 text-[#5a5a5c]">Describe what you need. AI extracts signals and ranks matches.</p>
       </div>
 
       {/* Step 1: Select type */}
@@ -90,10 +90,10 @@ export default function IntakePage() {
             <button
               key={pt.value}
               onClick={() => handleTypeSelect(pt.value)}
-              className="flex flex-col items-start rounded-2xl border border-[#e2e8f0] bg-white p-6 text-left shadow-sm transition hover:border-[#06b6d4] hover:shadow-md"
+              className="flex flex-col items-start rounded-2xl border border-[#dce6f0] bg-white p-6 text-left shadow-sm transition hover:border-[#00a3e0] hover:shadow-md"
             >
-              <span className="text-base font-semibold text-[#0f172a]">{pt.label}</span>
-              <span className="mt-1 text-sm text-[#64748b]">{pt.desc}</span>
+              <span className="text-base font-semibold text-[#1c1c1d]">{pt.label}</span>
+              <span className="mt-1 text-sm text-[#5a5a5c]">{pt.desc}</span>
             </button>
           ))}
         </div>
@@ -101,38 +101,38 @@ export default function IntakePage() {
 
       {/* Step 2: Describe */}
       {step === 2 && (
-        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-8 shadow-sm">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#1e3a5f]/5 px-3 py-1 text-xs font-medium text-[#1e3a5f]">
+        <div className="rounded-2xl border border-[#dce6f0] bg-white p-8 shadow-sm">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#0048bd]/5 px-3 py-1 text-xs font-medium text-[#0048bd]">
             <Lightbulb className="h-3.5 w-3.5" />
             Step 2 of 3
           </div>
-          <label className="block text-sm font-semibold text-[#0f172a]">What connection are you looking for?</label>
+          <label className="block text-sm font-semibold text-[#1c1c1d]">What connection are you looking for?</label>
           <textarea
             value={form.naturalDescription}
             onChange={(e) => setForm((f) => ({ ...f, naturalDescription: e.target.value }))}
             placeholder="Example: I am a fractional COO with medical device commercialization experience looking for a seed-stage life sciences startup in Utah..."
-            className="mt-3 block w-full rounded-xl border border-[#e2e8f0] bg-[#f8f9fb] px-4 py-3 text-sm text-[#0f172a] outline-none ring-[#06b6d4] placeholder:text-[#94a3b8] focus:ring-2"
+            className="mt-3 block w-full rounded-xl border border-[#dce6f0] bg-[#f4fafe] px-4 py-3 text-sm text-[#1c1c1d] outline-none ring-[#00a3e0] placeholder:text-[#8a8a8c] focus:ring-2"
             rows={5}
           />
 
           <div className="mt-6 grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Name</label>
+              <label className="block text-sm font-semibold text-[#1c1c1d]">Name</label>
               <input
                 type="text"
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                className="mt-2 block w-full rounded-xl border border-[#e2e8f0] bg-[#f8f9fb] px-4 py-2.5 text-sm outline-none ring-[#06b6d4] placeholder:text-[#94a3b8] focus:ring-2"
+                className="mt-2 block w-full rounded-xl border border-[#dce6f0] bg-[#f4fafe] px-4 py-2.5 text-sm outline-none ring-[#00a3e0] placeholder:text-[#8a8a8c] focus:ring-2"
                 placeholder="Your name"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#0f172a]">Email</label>
+              <label className="block text-sm font-semibold text-[#1c1c1d]">Email</label>
               <input
                 type="email"
                 value={form.email}
                 onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                className="mt-2 block w-full rounded-xl border border-[#e2e8f0] bg-[#f8f9fb] px-4 py-2.5 text-sm outline-none ring-[#06b6d4] placeholder:text-[#94a3b8] focus:ring-2"
+                className="mt-2 block w-full rounded-xl border border-[#dce6f0] bg-[#f4fafe] px-4 py-2.5 text-sm outline-none ring-[#00a3e0] placeholder:text-[#8a8a8c] focus:ring-2"
                 placeholder="you@example.com"
               />
             </div>
@@ -141,7 +141,7 @@ export default function IntakePage() {
           <button
             onClick={handleDescribe}
             disabled={!form.naturalDescription || !form.name}
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#1e3a5f] px-6 py-3 text-sm font-semibold text-white shadow transition hover:bg-[#2d4a6f] disabled:opacity-40"
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0048bd] px-6 py-3 text-sm font-semibold text-white shadow transition hover:bg-[#0066e0] disabled:opacity-40"
           >
             Extract signals
             <ArrowRight className="h-4 w-4" />
@@ -151,32 +151,32 @@ export default function IntakePage() {
 
       {/* Step 3: Review + Submit */}
       {step === 3 && (
-        <div className="rounded-2xl border border-[#e2e8f0] bg-white p-8 shadow-sm">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#10b981]/10 px-3 py-1 text-xs font-medium text-[#10b981]">
+        <div className="rounded-2xl border border-[#dce6f0] bg-white p-8 shadow-sm">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-[#0d9f6e]/10 px-3 py-1 text-xs font-medium text-[#0d9f6e]">
             <Wand2 className="h-3.5 w-3.5" />
             Step 3 of 3 — AI Normalized
           </div>
 
           <div className="mb-6">
-            <h3 className="text-sm font-semibold text-[#0f172a]">Extracted signals:</h3>
+            <h3 className="text-sm font-semibold text-[#1c1c1d]">Extracted signals:</h3>
             <div className="mt-3 flex flex-wrap gap-2">
               {extracted.map((s) => (
-                <span key={s} className="rounded-full bg-[#f1f5f9] px-3 py-1 text-xs font-medium text-[#1e3a5f]">
+                <span key={s} className="rounded-full bg-[#eef6fc] px-3 py-1 text-xs font-medium text-[#0048bd]">
                   {s}
                 </span>
               ))}
             </div>
           </div>
 
-          <div className="space-y-3 text-sm text-[#64748b]">
-            <p><span className="font-semibold text-[#0f172a]">Profile type:</span> {entity.type}</p>
-            <p><span className="font-semibold text-[#0f172a]">Name:</span> {form.name}</p>
-            <p><span className="font-semibold text-[#0f172a]">Location:</span> Utah</p>
+          <div className="space-y-3 text-sm text-[#5a5a5c]">
+            <p><span className="font-semibold text-[#1c1c1d]">Profile type:</span> {entity.type}</p>
+            <p><span className="font-semibold text-[#1c1c1d]">Name:</span> {form.name}</p>
+            <p><span className="font-semibold text-[#1c1c1d]">Location:</span> Utah</p>
           </div>
 
           <button
             onClick={handleSubmit}
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#1e3a5f] px-6 py-3 text-sm font-semibold text-white shadow transition hover:bg-[#2d4a6f]"
+            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0048bd] px-6 py-3 text-sm font-semibold text-white shadow transition hover:bg-[#0066e0]"
           >
             Find Matches
             <ArrowRight className="h-4 w-4" />
