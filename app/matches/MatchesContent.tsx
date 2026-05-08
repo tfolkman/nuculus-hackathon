@@ -21,7 +21,45 @@ import {
   Award,
   Zap,
   Lightbulb,
+  Network,
 } from "lucide-react";
+
+function SharedConnections({ source, target }: { source: Entity; target: Entity }) {
+  const sharedInst = source.institutionAffiliations?.filter(
+    (i) => i !== "none" && i !== "out_of_state" && target.institutionAffiliations?.includes(i)
+  ) || [];
+  const sharedLocation =
+    source.location && target.location && source.location === target.location;
+  const sharedSectors = source.sectors.filter((s) => target.sectors.includes(s));
+
+  if (sharedInst.length === 0 && !sharedLocation && sharedSectors.length === 0) return null;
+
+  return (
+    <div className="rounded-xl bg-[#f4fafe] border border-[#dce6f0] p-4">
+      <div className="flex items-center gap-2 text-sm font-bold text-[#1c1c1d]">
+        <Network className="h-4 w-4 text-[#0048bd]" />
+        Shared Connections
+      </div>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {sharedInst.map((inst) => (
+          <span key={inst} className="rounded-full bg-[#0048bd]/10 px-2.5 py-1 text-xs font-medium text-[#0048bd]">
+            🎓 {inst.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+          </span>
+        ))}
+        {sharedLocation && (
+          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 border border-emerald-200">
+            📍 {source.location}
+          </span>
+        )}
+        {sharedSectors.map((s) => (
+          <span key={s} className="rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-700 border border-amber-200">
+            ⚡ {s.replace(/_/g, " ")}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function ScoreBar({ label, value, max, color = "bg-[#0048bd]" }: { label: string; value: number; max: number; color?: string }) {
   return (
@@ -291,6 +329,7 @@ export default function MatchesPage() {
                       </div>
 
                       <GapRecommendation match={m} />
+                      <SharedConnections source={source} target={target} />
                     </div>
 
                     <div className="space-y-5">
