@@ -2,6 +2,17 @@ import { Entity, Match, ScoreBreakdown, MatchReason, EvidenceSignal, MatchGap } 
 import { scoreMatch, totalScore, confidenceFromScore } from "./score";
 import { formatLabel } from "@/lib/format";
 
+/** Word-boundary-aware phrase check — prevents "ai" from matching "aiden" */
+function phraseIncludes(text: string, phrase: string): boolean {
+  const t = text.toLowerCase();
+  const p = phrase.toLowerCase();
+  const idx = t.indexOf(p);
+  if (idx === -1) return false;
+  const before = idx === 0 ? " " : t[idx - 1];
+  const after = idx + p.length >= t.length ? " " : t[idx + p.length];
+  return !/\w/.test(before) && !/\w/.test(after);
+}
+
 /** Check if the entity has meaningful user-provided data vs. defaults/inferences */
 function isProfileSparse(entity: Entity): boolean {
   const hasRealSkills = entity.skills.length > 0 && !entity.skills.every((s) => s === "");
@@ -156,15 +167,15 @@ export function buildExplanation(source: Entity, target: Entity): Omit<Match, "i
   // Only claim skill-to-need fit if source actually has skills
   if (breakdown.roleNeedFit >= 10 && source.skills.length > 0 && !source.skills.every((s) => s === "")) {
     const skillMatches = source.skills.filter((s) =>
-      target.needs?.some((n) => n.description.toLowerCase().includes(s.toLowerCase().replace(/_/g, " ")))
+      target.needs?.some((n) => phraseIncludes(n.description, s.replace(/_/g, " ")))
     );
     const expertiseMatches = source.expertise.filter((e) =>
-      target.needs?.some((n) => n.description.toLowerCase().includes(e.toLowerCase().replace(/_/g, " ")))
+      target.needs?.some((n) => phraseIncludes(n.description, e.replace(/_/g, " ")))
     );
     const allMatches = [...new Set([...skillMatches, ...expertiseMatches])];
     if (allMatches.length > 0) {
       const needDesc = target.needs?.find((n) =>
-        allMatches.some((m) => n.description.toLowerCase().includes(m.toLowerCase().replace(/_/g, " ")))
+        allMatches.some((m) => phraseIncludes(n.description, m.replace(/_/g, " ")))
       )?.description || target.needs?.[0]?.description || "key needs";
 
       reasons.push({

@@ -45,8 +45,8 @@ function hasSemanticOverlap(a: string[], b: string[]): { score: number; reason: 
     for (const termB of b) {
       const normB = normalizeTerm(termB);
 
-      // Direct match
-      if (normA === normB || normA.includes(normB) || normB.includes(normA)) {
+      // Direct match (strict — no substring matching to avoid false positives like "aiden" matching "ai")
+      if (normA === normB) {
         return { score: 1.0, reason: `${termA} directly matches ${termB}` };
       }
 
