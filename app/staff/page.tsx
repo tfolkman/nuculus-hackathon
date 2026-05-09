@@ -5,11 +5,13 @@ import Link from "next/link";
 import { Entity, Match } from "@/lib/types";
 import { seedEntities } from "@/lib/data/seed-entities";
 import { buildExplanation } from "@/lib/matching/explain";
-import { Eye, ArrowRight, CheckCircle2, Clock, AlertCircle, TrendingUp, Users, Building2, Network } from "lucide-react";
+import { Eye, ArrowRight, CheckCircle2, Clock, AlertCircle, TrendingUp, Users, Building2, Network, Ban, CheckCircle } from "lucide-react";
+import { getAllMatchStatuses } from "@/lib/match-status";
 
 type QueueItem = {
   intake: Entity;
   topMatch: ReturnType<typeof buildExplanation> | null;
+  persistedStatus?: import("@/lib/match-status").PersistedMatchStatus;
 };
 
 export default function StaffPage() {
@@ -27,13 +29,16 @@ export default function StaffPage() {
       }
     }
 
+    const persisted = getAllMatchStatuses();
     const intakes = all.filter((e) => e.id.startsWith("intake-"));
     const items = intakes.map((intake) => {
       const candidates = all.filter((e) => e.id !== intake.id);
       const scored = candidates
         .map((c) => buildExplanation(intake, c))
         .sort((a, b) => b.score - a.score);
-      return { intake, topMatch: scored[0] || null };
+      const topMatch = scored[0] || null;
+      const key = topMatch ? `${topMatch.sourceEntityId}--${topMatch.targetEntityId}` : "";
+      return { intake, topMatch, persistedStatus: persisted[key] };
     });
 
     setQueue(items);
@@ -43,7 +48,16 @@ export default function StaffPage() {
   const needsReview = queue.filter((q) => q.topMatch && q.topMatch.score >= 40 && q.topMatch.score < 65).length;
   const lowConfidence = queue.filter((q) => !q.topMatch || q.topMatch.score < 40).length;
 
-  function statusBadge(topMatch: QueueItem["topMatch"]) {
+  function statusBadge(item: QueueItem) {
+    // If a human has already reviewed this match, show that status
+    if (item.persistedStatus) {
+      const s = item.persistedStatus.status;
+      if (s === "approved") return { label: "Approved", color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle };
+      if (s === "rejected") return { label: "Rejected", color: "bg-red-50 text-red-700 border-red-200", icon: Ban };
+      if (s === "held") return { label: "On Hold", color: "bg-amber-50 text-amber-700 border-amber-200", icon: Clock };
+    }
+
+    const topMatch = item.topMatch;
     if (!topMatch) return { label: "New", color: "bg-gray-100 text-gray-600 border-gray-200", icon: AlertCircle };
     if (topMatch.score >= 65) return { label: "AI Matched", color: "bg-emerald-50 text-emerald-700 border-emerald-200", icon: CheckCircle2 };
     if (topMatch.score >= 40) return { label: "Needs Review", color: "bg-amber-50 text-amber-700 border-amber-200", icon: Clock };
@@ -90,7 +104,7 @@ export default function StaffPage() {
 
       <div className="grid gap-4">
         {queue.map((item) => {
-          const s = statusBadge(item.topMatch);
+          const s = statusBadge(item);
           const detailId = `${item.intake.id}--${item.topMatch?.targetEntityId || "none"}`;
           const targetName = item.topMatch
             ? seedEntities.find((e) => e.id === item.topMatch!.targetEntityId)?.name
@@ -98,10 +112,10 @@ export default function StaffPage() {
           return (
             <div
               key={item.intake.id}
-              className="flex flex-col gap-4 rounded-2xl border border-[#dce6f0] bg-white p-5 shadow-sm transition hover:shadow-md hover:-translate-y-0.5 sm:flex-row sm:items-center sm:justify-between"
+              className={`flex flex-col gap-4 rounded-2xl border p-5 shadow-sm transition hover:shadow-md hover:-translate-y-0.5 sm:flex-row sm:items-center sm:justify-between ${item.persistedStatus ? "bg-[#f8fafc] border-[#dce6f0]" : "bg-white border-[#dce6f0]"}`}
             >
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-10 w-10 items-center justify-center rounded-full bg-[#0048bd]/5">
+                <div className={`mt-0.5 flex h-10 w-10 items-center justify-center rounded-full ${item.persistedStatus ? "bg-emerald-50" : "bg-[#0048bd]/5"}`}>
                   <s.icon className={`h-5 w-5 ${s.color.includes("emerald") ? "text-emerald-600" : s.color.includes("amber") ? "text-amber-600" : s.color.includes("red") ? "text-red-600" : "text-[#5a5a5c]"}`} />
                 </div>
                 <div>

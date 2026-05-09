@@ -13,6 +13,7 @@ import { MatchExplanation } from "@/app/matches/MatchExplanation";
 import { formatLabel } from "@/lib/format";
 import { scoreMatchWithAI } from "@/lib/ai/score-actions";
 import { computeSemanticScore } from "@/lib/ai/semantic-score";
+import { getMatchStatus, setMatchStatus as persistMatchStatus } from "@/lib/match-status";
 
 export default function MatchDetailPage() {
   const params = useParams();
@@ -22,7 +23,7 @@ export default function MatchDetailPage() {
 
   const [entities, setEntities] = useState<Entity[]>(seedEntities);
   const [matchStatus, setMatchStatus] = useState<Match["status"]>("suggested");
-  const [syncStatus, setSyncStatus] = useState<string>("not_synced");
+  const [syncStatus, setSyncStatus] = useState<Match["affinitySyncStatus"]>("not_synced");
   const [showConfetti, setShowConfetti] = useState(false);
   const [copied, setCopied] = useState(false);
   const [aiScore, setAiScore] = useState<{ totalScore: number; confidence: string; aiExplanation: string; source: "semantic" | "llm" } | null>(null);
@@ -42,6 +43,16 @@ export default function MatchDetailPage() {
 
   const source = entities.find((e) => e.id === sourceId);
   const target = entities.find((e) => e.id === targetId);
+
+  // Load persisted match status
+  useEffect(() => {
+    if (!sourceId || !targetId) return;
+    const persisted = getMatchStatus(sourceId, targetId);
+    if (persisted) {
+      setMatchStatus(persisted.status);
+      setSyncStatus(persisted.affinitySyncStatus);
+    }
+  }, [sourceId, targetId]);
 
   useEffect(() => {
     if (!source || !target) return;
@@ -93,16 +104,19 @@ export default function MatchDetailPage() {
   const handleApprove = () => {
     setMatchStatus("approved");
     setSyncStatus("mock_synced");
+    persistMatchStatus(sourceId, targetId, "approved", "mock_synced");
     setShowConfetti(true);
     setTimeout(() => setShowConfetti(false), 3000);
   };
   const handleReject = () => {
     setMatchStatus("rejected");
     setSyncStatus("not_synced");
+    persistMatchStatus(sourceId, targetId, "rejected", "not_synced");
   };
   const handleHold = () => {
     setMatchStatus("held");
     setSyncStatus("not_synced");
+    persistMatchStatus(sourceId, targetId, "held", "not_synced");
   };
 
   const confidenceColor =
@@ -274,24 +288,36 @@ export default function MatchDetailPage() {
         />
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <button
-            onClick={handleApprove}
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow hover:bg-emerald-700 hover:scale-[1.02] transition"
-          >
-            <CheckCircle className="h-4 w-4" /> Approve
-          </button>
-          <button
-            onClick={handleHold}
-            className="inline-flex items-center gap-2 rounded-xl border border-[#dce6f0] bg-white px-5 py-2.5 text-sm font-bold text-[#1c1c1d] hover:bg-[#f4fafe] hover:scale-[1.02] transition"
-          >
-            <PauseCircle className="h-4 w-4" /> Hold
-          </button>
-          <button
-            onClick={handleReject}
-            className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-bold text-red-700 hover:bg-red-100 hover:scale-[1.02] transition"
-          >
-            <XCircle className="h-4 w-4" /> Reject
-          </button>
+          {matchStatus === "approved" ? (
+            <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-50 border border-emerald-200 px-5 py-2.5 text-sm font-bold text-emerald-700">
+              <CheckCircle className="h-4 w-4" /> Approved on {new Date().toLocaleDateString()}
+            </div>
+          ) : matchStatus === "rejected" ? (
+            <div className="inline-flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-5 py-2.5 text-sm font-bold text-red-700">
+              <XCircle className="h-4 w-4" /> Rejected
+            </div>
+          ) : (
+            <>
+              <button
+                onClick={handleApprove}
+                className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-5 py-2.5 text-sm font-bold text-white shadow hover:bg-emerald-700 hover:scale-[1.02] transition"
+              >
+                <CheckCircle className="h-4 w-4" /> Approve
+              </button>
+              <button
+                onClick={handleHold}
+                className="inline-flex items-center gap-2 rounded-xl border border-[#dce6f0] bg-white px-5 py-2.5 text-sm font-bold text-[#1c1c1d] hover:bg-[#f4fafe] hover:scale-[1.02] transition"
+              >
+                <PauseCircle className="h-4 w-4" /> Hold
+              </button>
+              <button
+                onClick={handleReject}
+                className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-5 py-2.5 text-sm font-bold text-red-700 hover:bg-red-100 hover:scale-[1.02] transition"
+              >
+                <XCircle className="h-4 w-4" /> Reject
+              </button>
+            </>
+          )}
         </div>
       </div>
 
