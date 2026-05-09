@@ -8,7 +8,11 @@ import Link from "next/link";
 import { Entity, Match } from "@/lib/types";
 import { seedEntities } from "@/lib/data/seed-entities";
 import { buildExplanation } from "@/lib/matching/explain";
-import { ArrowLeft, CheckCircle, XCircle, PauseCircle, Send, Database, Loader2, Sparkles, Copy, Check } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, PauseCircle, Send, Database, Loader2, Sparkles, Copy, Check, Brain } from "lucide-react";
+import { MatchExplanation } from "@/app/matches/MatchExplanation";
+import { formatLabel } from "@/lib/format";
+import { scoreMatchWithAI } from "@/lib/ai/score-actions";
+import { computeSemanticScore } from "@/lib/ai/semantic-score";
 
 export default function MatchDetailPage() {
   const params = useParams();
@@ -21,6 +25,8 @@ export default function MatchDetailPage() {
   const [syncStatus, setSyncStatus] = useState<string>("not_synced");
   const [showConfetti, setShowConfetti] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [aiScore, setAiScore] = useState<{ totalScore: number; confidence: string; aiExplanation: string; source: "semantic" | "llm" } | null>(null);
+  const [aiScoreLoading, setAiScoreLoading] = useState(false);
 
   useEffect(() => {
     try {
@@ -36,6 +42,37 @@ export default function MatchDetailPage() {
 
   const source = entities.find((e) => e.id === sourceId);
   const target = entities.find((e) => e.id === targetId);
+
+  useEffect(() => {
+    if (!source || !target) return;
+
+    // 1. Show semantic score immediately
+    const semantic = computeSemanticScore(source, target);
+    setAiScore({
+      totalScore: semantic.totalScore,
+      confidence: semantic.confidence,
+      aiExplanation: semantic.aiExplanation,
+      source: "semantic",
+    });
+
+    // 2. Try LLM enhancement in background
+    setAiScoreLoading(true);
+    scoreMatchWithAI(JSON.stringify(source), JSON.stringify(target))
+      .then((result) => {
+        if (result && result.source === "llm") {
+          setAiScore({
+            totalScore: result.totalScore,
+            confidence: result.confidence,
+            aiExplanation: result.aiExplanation,
+            source: "llm",
+          });
+        }
+        setAiScoreLoading(false);
+      })
+      .catch(() => {
+        setAiScoreLoading(false);
+      });
+  }, [source, target]);
 
   const match = useMemo(() => {
     if (!source || !target) return null;
@@ -119,7 +156,7 @@ export default function MatchDetailPage() {
           <div className="mt-4 flex flex-wrap gap-2">
             {source.sectors.slice(0, 3).map((s) => (
               <span key={s} className="rounded-full bg-[#eef6fc] px-2.5 py-1 text-xs font-medium text-[#5a5a5c]">
-                {s.replace("_", " ")}
+                {formatLabel(s)}
               </span>
             ))}
           </div>
@@ -134,7 +171,7 @@ export default function MatchDetailPage() {
           <div className="mt-4 flex flex-wrap gap-2">
             {target.sectors.slice(0, 3).map((s) => (
               <span key={s} className="rounded-full bg-[#eef6fc] px-2.5 py-1 text-xs font-medium text-[#5a5a5c]">
-                {s.replace("_", " ")}
+                {formatLabel(s)}
               </span>
             ))}
           </div>
@@ -147,11 +184,30 @@ export default function MatchDetailPage() {
         <div className="flex items-center justify-between">
           <div>
             <div className="text-sm font-bold text-[#1c1c1d]">Match Score</div>
-            <div className={`mt-1 text-4xl font-bold ${confidenceColor}`}>{match.score}</div>
-            <div className="mt-1 text-sm text-[#5a5a5c]">
-              Confidence:{" "}
-              <span className={`font-bold capitalize ${confidenceColor}`}>{match.confidence}</span>
+            <div className="flex items-baseline gap-3">
+              <div className={`text-4xl font-bold ${confidenceColor}`}>{match.score}</div>
+              {aiScore && (
+                <div className="flex items-center gap-1.5">
+                  <Brain className="h-4 w-4 text-[#0048bd]" />
+                  <span className="text-lg font-bold text-[#0048bd]">{aiScore.totalScore}</span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${aiScore.source === "llm" ? "text-[#0048bd] bg-[#0048bd]/10" : "text-amber-700 bg-amber-100"}`}>
+                    {aiScore.source === "llm" ? "LLM AI" : "Semantic AI"}
+                  </span>
+                  {aiScoreLoading && aiScore.source === "semantic" && (
+                    <span className="text-xs text-[#5a5a5c] animate-pulse">(enhancing...)</span>
+                  )}
+                </div>
+              )}
             </div>
+            <div className="mt-1 text-sm text-[#5a5a5c]">
+              Deterministic: <span className={`font-bold capitalize ${confidenceColor}`}>{match.confidence}</span>
+              {aiScore && (
+                <span> · AI: <span className="font-bold capitalize text-[#0048bd]">{aiScore.confidence}</span></span>
+              )}
+            </div>
+            {aiScoreLoading && aiScore?.source === "semantic" && (
+              <div className="mt-1 text-xs text-[#5a5a5c] animate-pulse">LLM enhancing semantic score in background...</div>
+            )}
           </div>
           <div className="text-right">
             <div className="text-sm font-bold text-[#1c1c1d]">Status</div>
@@ -169,6 +225,17 @@ export default function MatchDetailPage() {
             </div>
           </div>
         </div>
+        {aiScore && (
+          <div className="mt-4 rounded-xl bg-[#0048bd]/5 p-3">
+            <div className="text-xs font-bold uppercase tracking-wide text-[#0048bd] mb-1">Why AI scored differently</div>
+            <div className="text-sm text-[#5a5a5c]">{aiScore.aiExplanation}</div>
+          </div>
+        )}
+      </div>
+
+      {/* AI Streaming Explanation */}
+      <div className="mt-6">
+        <MatchExplanation source={source} target={target} />
       </div>
 
       {/* Reasons + Evidence */}
@@ -190,7 +257,7 @@ export default function MatchDetailPage() {
           <div className="mt-4 flex flex-wrap gap-2">
             {match.evidence.map((e) => (
               <span key={`${e.field}-${e.value}`} className="rounded-full bg-[#00a3e0]/10 px-2.5 py-1 text-xs font-medium text-[#00a3e0]">
-                {e.field}: {e.value}
+                {formatLabel(e.field)}: {e.value}
               </span>
             ))}
           </div>

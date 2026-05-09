@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { EntityType, IntakeForm, Entity } from "@/lib/types";
 import { seedEntities } from "@/lib/data/seed-entities";
+import { normalizeIntake } from "@/lib/ai/actions";
 import { ArrowRight, Lightbulb, Wand2, Loader2, Sparkles, User, GraduationCap, Briefcase } from "lucide-react";
 
 const profileTypes: { value: EntityType; label: string; desc: string }[] = [
@@ -52,6 +53,7 @@ export default function IntakePage() {
   const [form, setForm] = useState<Partial<IntakeForm>>({ naturalDescription: "", name: "", email: "" });
   const [extracted, setExtracted] = useState<string[]>([]);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [normalizedData, setNormalizedData] = useState<Record<string, unknown> | null>(null);
 
   function handleTypeSelect(type: EntityType) {
     setEntity({ type });
@@ -69,105 +71,172 @@ export default function IntakePage() {
     handleDescribe(scenario.description);
   }
 
-  function handleDescribe(overrideText?: string) {
+  async function handleDescribe(overrideText?: string) {
     const text = overrideText || form.naturalDescription || "";
+    if (!text.trim() || !form.name) return;
+
     setIsAnalyzing(true);
 
-    setTimeout(() => {
-      const signals: string[] = [];
-      if (/ceo|cto|coo|executive/i.test(text)) signals.push("Executive role");
-      if (/engineer|developer|software/i.test(text)) signals.push("Engineering");
-      if (/sales|marketing|growth|business development/i.test(text)) signals.push("Go-to-market");
-      if (/utah|salt lake|provo|logan|ogden|lehi/i.test(text)) signals.push("Utah-based");
-      if (/university|student|intern|byu|usu|u of u/i.test(text)) signals.push("Student / Intern");
-      if (/ai|machine learning|ml|computer vision/i.test(text)) signals.push("AI / ML");
-      if (/life science|biotech|medical|fda|510k|diagnostic/i.test(text)) signals.push("Life sciences");
-      if (/energy|solar|battery|cleantech|grid/i.test(text)) signals.push("Energy / Cleantech");
-      if (/defense|aerospace|dod|sbir|sttr/i.test(text)) signals.push("Defense / Aerospace");
-      if (/fractional|advisor|advisory|board/i.test(text)) signals.push("Fractional / Advisory");
-      if (/cyber|security|cryptography/i.test(text)) signals.push("Cybersecurity");
-      if (/fintech|financial|banking/i.test(text)) signals.push("Fintech");
-      if (/seed|pre-seed|early stage/i.test(text)) signals.push("Early-stage");
-      if (/series a|growth|scaling/i.test(text)) signals.push("Growth-stage");
-      if (signals.length === 0) signals.push("Utah innovation ecosystem");
-      setExtracted(signals);
+    // Call AI normalization
+    try {
+      const result = await normalizeIntake(text, entity.type || "talent");
+
+      if (result.fallback || !result.data) {
+        // Deterministic fallback extraction
+        const signals: string[] = [];
+        if (/ceo|cto|coo|executive/i.test(text)) signals.push("Executive role");
+        if (/engineer|developer|software/i.test(text)) signals.push("Engineering");
+        if (/sales|marketing|growth|business development/i.test(text)) signals.push("Go-to-market");
+        if (/utah|salt lake|provo|logan|ogden|lehi/i.test(text)) signals.push("Utah-based");
+        if (/university|student|intern|byu|usu|u of u/i.test(text)) signals.push("Student / Intern");
+        if (/ai|machine learning|ml|computer vision/i.test(text)) signals.push("AI / ML");
+        if (/life science|biotech|medical|fda|510k|diagnostic/i.test(text)) signals.push("Life sciences");
+        if (/energy|solar|battery|cleantech|grid/i.test(text)) signals.push("Energy / Cleantech");
+        if (/defense|aerospace|dod|sbir|sttr/i.test(text)) signals.push("Defense / Aerospace");
+        if (/fractional|advisor|advisory|board/i.test(text)) signals.push("Fractional / Advisory");
+        if (/cyber|security|cryptography/i.test(text)) signals.push("Cybersecurity");
+        if (/fintech|financial|banking/i.test(text)) signals.push("Fintech");
+        if (/seed|pre-seed|early stage/i.test(text)) signals.push("Early-stage");
+        if (/series a|growth|scaling/i.test(text)) signals.push("Growth-stage");
+        if (signals.length === 0) signals.push("Utah innovation ecosystem");
+        setExtracted(signals);
+        setNormalizedData(null);
+      } else {
+        // AI extracted data — auto-populate
+        const data = result.data;
+        setNormalizedData(data);
+
+        const signals = [
+          ...((data.sectors as string[]) || []).map((s: string) => s.replace(/_/g, " ")),
+          ...((data.skills as string[]) || []).slice(0, 4),
+          ...((data.stagePreferences as string[]) || []).map((s: string) => s.replace(/_/g, " ")),
+          ...((data.institutionAffiliations as string[]) || []).map((s: string) => s.replace(/_/g, " ")),
+          data.availability as string,
+        ].filter(Boolean);
+        setExtracted(signals.length > 0 ? signals : ["Utah innovation ecosystem"]);
+      }
+    } catch (e) {
+      console.error("AI normalization failed:", e);
+      // Fallback on error
+      setExtracted(["Utah innovation ecosystem"]);
+      setNormalizedData(null);
+    } finally {
       setIsAnalyzing(false);
       setStep(3);
-    }, 1400);
+    }
   }
 
   function handleSubmit() {
     const text = (form.naturalDescription || "").toLowerCase();
-    const sectors: Entity["sectors"] = [];
-    if (/life science|biotech|medical|fda|diagnostic|therapeutic|pharma/.test(text)) sectors.push("life_sciences");
-    if (/ai|machine learning|ml|computer vision|neural|algorithm/.test(text)) sectors.push("ai");
-    if (/defense|aerospace|military|dod|satellite/.test(text)) sectors.push("defense_aerospace");
-    if (/cyber|security|cryptography|encryption|threat/.test(text)) sectors.push("cyber");
-    if (/energy|solar|battery|grid|microgrid|renewable|power|cleantech/.test(text)) sectors.push("energy");
-    if (/manufacturing|factory|production|industrial|automation|robotics/.test(text)) sectors.push("advanced_manufacturing");
-    if (/fintech|financial|banking|payment|credit|crypto/.test(text)) sectors.push("fintech");
-    if (/software|saas|app|platform|api|developer|code/.test(text)) sectors.push("software");
-    if (/clean|climate|carbon|green|sustainable|environmental|agriculture/.test(text)) sectors.push("cleantech");
 
-    const skills: string[] = [];
-    if (/commercialization/.test(text)) skills.push("commercialization");
-    if (/regulatory|fda|510k|iso/.test(text)) skills.push("regulatory_strategy");
-    if (/engineering/.test(text)) skills.push("engineering");
-    if (/sales/.test(text)) skills.push("sales");
-    if (/marketing/.test(text)) skills.push("marketing");
-    if (/software|code|developer/.test(text)) skills.push("software");
-    if (/python/.test(text)) skills.push("python");
-    if (/machine learning|ml|computer vision/.test(text)) skills.push("machine_learning");
-    if (/operations|ops/.test(text)) skills.push("operations");
-    if (/strategy/.test(text)) skills.push("strategy");
-    if (/finance|financial/.test(text)) skills.push("finance");
-    if (/legal|attorney|law/.test(text)) skills.push("legal");
-    if (/patent|ip/.test(text)) skills.push("ip_strategy");
-    if (/grant|sbir|sttr/.test(text)) skills.push("grant_writing");
-    if (/management|leadership/.test(text)) skills.push("management");
-    if (/product/.test(text)) skills.push("product");
-    if (/design/.test(text)) skills.push("design");
-    if (/data|analytics/.test(text)) skills.push("data_analysis");
+    // Use AI-normalized data if available, otherwise fall back to regex
+    const sectors: Entity["sectors"] = normalizedData?.sectors && (normalizedData.sectors as string[]).length > 0
+      ? (normalizedData.sectors as string[]).filter((s: string) =>
+          ["life_sciences","ai","defense_aerospace","cyber","energy","advanced_manufacturing","fintech","software","cleantech","other"].includes(s)
+        ) as Entity["sectors"]
+      : [];
 
-    const stagePreferences: Entity["stagePreferences"] = [];
-    if (/pre[-\s]?seed/.test(text)) stagePreferences.push("pre_seed");
-    if (/seed[-\s]?stage|seed stage|raising seed/.test(text)) stagePreferences.push("seed");
-    if (/series a/.test(text)) stagePreferences.push("series_a");
-    if (/growth|scaling/.test(text)) stagePreferences.push("growth");
-    if (/prototype/.test(text)) stagePreferences.push("prototype");
-    if (/idea/.test(text)) stagePreferences.push("idea");
-    if (/sbir/.test(text)) stagePreferences.push("sbir_phase_i", "sbir_phase_ii");
-    if (stagePreferences.length === 0) stagePreferences.push("seed");
+    if (sectors.length === 0) {
+      if (/life science|biotech|medical|fda|diagnostic|therapeutic|pharma/.test(text)) sectors.push("life_sciences");
+      if (/ai|machine learning|ml|computer vision|neural|algorithm/.test(text)) sectors.push("ai");
+      if (/defense|aerospace|military|dod|satellite/.test(text)) sectors.push("defense_aerospace");
+      if (/cyber|security|cryptography|encryption|threat/.test(text)) sectors.push("cyber");
+      if (/energy|solar|battery|grid|microgrid|renewable|power|cleantech/.test(text)) sectors.push("energy");
+      if (/manufactur|factory|production|industrial|automation|robotics/.test(text)) sectors.push("advanced_manufacturing");
+      if (/fintech|financial|banking|payment|credit|crypto/.test(text)) sectors.push("fintech");
+      if (/software|saas|app|platform|api|developer|code/.test(text)) sectors.push("software");
+      if (/clean|climate|carbon|green|sustainable|environmental|agriculture/.test(text)) sectors.push("cleantech");
+    }
 
-    let availability: Entity["availability"] = undefined;
-    if (/fractional/.test(text)) availability = "fractional";
-    else if (/intern|student/.test(text)) availability = "internship";
-    else if (/advisor|advisory|board/.test(text)) availability = "advisory";
-    else if (/full[-\s]?time|co[-\s]?founder|cto|ceo|coo|vp/.test(text)) availability = "full_time";
+    const skills: string[] = normalizedData?.skills && (normalizedData.skills as string[]).length > 0
+      ? (normalizedData.skills as string[])
+      : [];
+    if (skills.length === 0) {
+      if (/commercialization/.test(text)) skills.push("commercialization");
+      if (/regulatory|fda|510k|iso/.test(text)) skills.push("regulatory_strategy");
+      if (/engineering/.test(text)) skills.push("engineering");
+      if (/sales/.test(text)) skills.push("sales");
+      if (/marketing/.test(text)) skills.push("marketing");
+      if (/software|code|developer/.test(text)) skills.push("software");
+      if (/python/.test(text)) skills.push("python");
+      if (/machine learning|ml|computer vision/.test(text)) skills.push("machine_learning");
+      if (/operations|ops/.test(text)) skills.push("operations");
+      if (/strategy/.test(text)) skills.push("strategy");
+      if (/finance|financial/.test(text)) skills.push("finance");
+      if (/legal|attorney|law/.test(text)) skills.push("legal");
+      if (/patent|ip/.test(text)) skills.push("ip_strategy");
+      if (/grant|sbir|sttr/.test(text)) skills.push("grant_writing");
+      if (/management|leadership/.test(text)) skills.push("management");
+      if (/product/.test(text)) skills.push("product");
+      if (/design/.test(text)) skills.push("design");
+      if (/data|analytics/.test(text)) skills.push("data_analysis");
+    }
 
-    const institutionAffiliations: Entity["institutionAffiliations"] = [];
-    if (/university of utah|u of u/.test(text)) institutionAffiliations.push("university_of_utah");
-    if (/byu|brigham young/.test(text)) institutionAffiliations.push("brigham_young_university");
-    if (/usu|utah state/.test(text)) institutionAffiliations.push("utah_state_university");
-    if (/uvu|utah valley/.test(text)) institutionAffiliations.push("utah_valley_university");
-    if (institutionAffiliations.length === 0) institutionAffiliations.push("none");
+    const stagePreferences: Entity["stagePreferences"] = normalizedData?.stagePreferences && (normalizedData.stagePreferences as string[]).length > 0
+      ? (normalizedData.stagePreferences as string[]).filter((s: string) =>
+          ["idea","research","prototype","pre_seed","seed","series_a","growth","commercialization","sbir_phase_i","sbir_phase_ii"].includes(s)
+        ) as Entity["stagePreferences"]
+      : [];
+    if (stagePreferences.length === 0) {
+      if (/pre[-\s]?seed/.test(text)) stagePreferences.push("pre_seed");
+      if (/seed[-\s]?stage|seed stage|raising seed/.test(text)) stagePreferences.push("seed");
+      if (/series a/.test(text)) stagePreferences.push("series_a");
+      if (/growth|scaling/.test(text)) stagePreferences.push("growth");
+      if (/prototype/.test(text)) stagePreferences.push("prototype");
+      if (/idea/.test(text)) stagePreferences.push("idea");
+      if (/sbir/.test(text)) stagePreferences.push("sbir_phase_i", "sbir_phase_ii");
+      if (stagePreferences.length === 0) stagePreferences.push("seed");
+    }
+
+    let availability: Entity["availability"] = normalizedData?.availability && (normalizedData.availability as string) !== ""
+      ? (normalizedData.availability as Entity["availability"])
+      : undefined;
+    if (!availability) {
+      if (/fractional/.test(text)) availability = "fractional";
+      else if (/intern|student/.test(text)) availability = "internship";
+      else if (/advisor|advisory|board/.test(text)) availability = "advisory";
+      else if (/full[-\s]?time|co[-\s]?founder|cto|ceo|coo|vp/.test(text)) availability = "full_time";
+    }
+
+    const institutionAffiliations: Entity["institutionAffiliations"] = normalizedData?.institutionAffiliations && (normalizedData.institutionAffiliations as string[]).length > 0
+      ? (normalizedData.institutionAffiliations as string[]).filter((s: string) =>
+          ["university_of_utah","brigham_young_university","utah_state_university","utah_valley_university","weber_state_university","utah_tech_university","southern_utah_university","salt_lake_community_college","none","out_of_state"].includes(s)
+        ) as Entity["institutionAffiliations"]
+      : [];
+    if (institutionAffiliations.length === 0) {
+      if (/university of utah|u of u/.test(text)) institutionAffiliations.push("university_of_utah");
+      if (/byu|brigham young/.test(text)) institutionAffiliations.push("brigham_young_university");
+      if (/usu|utah state/.test(text)) institutionAffiliations.push("utah_state_university");
+      if (/uvu|utah valley/.test(text)) institutionAffiliations.push("utah_valley_university");
+      if (/mit\b|massachusetts institute/.test(text)) institutionAffiliations.push("out_of_state");
+      if (/stanford|harvard|berkeley|caltech|cmu|carnegie mellon/.test(text)) institutionAffiliations.push("out_of_state");
+      if (institutionAffiliations.length === 0) institutionAffiliations.push("none");
+    }
 
     const id = `intake-${Date.now()}`;
     const newEntity: Entity = {
       id,
       type: entity.type || "talent",
       name: form.name || "Anonymous",
-      headline: form.naturalDescription?.slice(0, 80) || "New submission",
+      headline: (normalizedData?.headline as string) || form.naturalDescription?.slice(0, 80) || "New submission",
       summary: form.naturalDescription || "",
       location: "Utah",
       sectors,
       institutionAffiliations,
       stagePreferences,
-      missionInterests: ["utah_ecosystem"],
+      missionInterests: normalizedData?.missionInterests && (normalizedData.missionInterests as string[]).length > 0
+        ? (normalizedData.missionInterests as string[])
+        : /utah|salt lake|provo|logan|byu|usu|u of u/.test(text)
+        ? ["utah_ecosystem"]
+        : [],
       skills,
       expertise: skills,
-      needs: [],
-      offers: [{ category: "role", description: form.naturalDescription || "" }],
+      needs: normalizedData?.needs
+        ? (normalizedData.needs as { category: string; description: string }[])
+        : [],
+      offers: normalizedData?.offers && (normalizedData.offers as { category: string; description: string }[]).length > 0
+        ? (normalizedData.offers as { category: string; description: string }[])
+        : [{ category: "role", description: form.naturalDescription || "" }],
       fundingStatus: undefined,
       origin: undefined,
       trl: undefined,
@@ -333,8 +402,8 @@ export default function IntakePage() {
             <div className="mt-3 flex flex-wrap gap-2">
               {extracted.map((s, i) => (
                 <span
-                  key={s}
-                  className="rounded-full bg-[#eef6fc] px-3 py-1 text-xs font-medium text-[#0048bd]"
+                  key={s + i}
+                  className="rounded-full bg-[#eef6fc] px-3 py-1 text-xs font-medium text-[#0048bd] animate-fade-in"
                   style={{ animationDelay: `${i * 80}ms` }}
                 >
                   {s}
@@ -342,6 +411,28 @@ export default function IntakePage() {
               ))}
             </div>
           </div>
+
+          {normalizedData && (
+            <div className="mb-6 rounded-xl bg-[#f4fafe] p-4 border border-[#dce6f0]">
+              <div className="text-xs font-bold uppercase tracking-wide text-[#8a8a8c] mb-2">
+                AI-Extracted Profile
+              </div>
+              <div className="space-y-2 text-sm text-[#5a5a5c]">
+                {(normalizedData.headline as string) && (
+                  <p><span className="font-semibold text-[#1c1c1d]">Headline:</span> {normalizedData.headline as string}</p>
+                )}
+                {(normalizedData.availability as string) && (
+                  <p><span className="font-semibold text-[#1c1c1d]">Availability:</span> {normalizedData.availability as string}</p>
+                )}
+                {(normalizedData.skills as string[])?.length > 0 && (
+                  <p><span className="font-semibold text-[#1c1c1d]">Skills:</span> {(normalizedData.skills as string[]).join(", ")}</p>
+                )}
+                {(normalizedData.needs as { description: string }[])?.length > 0 && (
+                  <p><span className="font-semibold text-[#1c1c1d]">Needs:</span> {(normalizedData.needs as { description: string }[]).map((n) => n.description).join("; ")}</p>
+                )}
+              </div>
+            </div>
+          )}
 
           <div className="space-y-3 text-sm text-[#5a5a5c]">
             <p><span className="font-semibold text-[#1c1c1d]">Profile type:</span> {entity.type}</p>

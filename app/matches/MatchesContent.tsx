@@ -22,6 +22,7 @@ import {
   Zap,
   Lightbulb,
 } from "lucide-react";
+import { formatLabel } from "@/lib/format";
 
 function ScoreBar({ label, value, max, color = "bg-[#0048bd]" }: { label: string; value: number; max: number; color?: string }) {
   return (
@@ -232,7 +233,7 @@ export default function MatchesPage() {
                         {target.name}
                       </span>
                       <span className="rounded-full bg-[#eef6fc] px-2 py-0.5 text-xs font-medium text-[#5a5a5c]">
-                        {target.type}
+                        {formatLabel(target.type)}
                       </span>
                     </div>
                     <div className="mt-0.5 text-sm text-[#5a5a5c]">
@@ -284,7 +285,7 @@ export default function MatchesPage() {
                               key={e.field}
                               className="rounded-full bg-[#00a3e0]/10 px-2.5 py-1 text-xs font-medium text-[#00a3e0]"
                             >
-                              {e.field}: {e.value}
+                              {formatLabel(e.field)}: {e.value}
                             </span>
                           ))}
                         </div>
