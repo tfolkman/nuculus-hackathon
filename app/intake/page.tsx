@@ -84,20 +84,20 @@ export default function IntakePage() {
       if (result.fallback || !result.data) {
         // Deterministic fallback extraction
         const signals: string[] = [];
-        if (/ceo|cto|coo|executive/i.test(text)) signals.push("Executive role");
-        if (/engineer|developer|software/i.test(text)) signals.push("Engineering");
-        if (/sales|marketing|growth|business development/i.test(text)) signals.push("Go-to-market");
-        if (/utah|salt lake|provo|logan|ogden|lehi/i.test(text)) signals.push("Utah-based");
-        if (/university|student|intern|byu|usu|u of u/i.test(text)) signals.push("Student / Intern");
-        if (/ai|machine learning|ml|computer vision/i.test(text)) signals.push("AI / ML");
-        if (/life science|biotech|medical|fda|510k|diagnostic/i.test(text)) signals.push("Life sciences");
-        if (/energy|solar|battery|cleantech|grid/i.test(text)) signals.push("Energy / Cleantech");
-        if (/defense|aerospace|dod|sbir|sttr/i.test(text)) signals.push("Defense / Aerospace");
-        if (/fractional|advisor|advisory|board/i.test(text)) signals.push("Fractional / Advisory");
-        if (/cyber|security|cryptography/i.test(text)) signals.push("Cybersecurity");
-        if (/fintech|financial|banking/i.test(text)) signals.push("Fintech");
-        if (/seed|pre-seed|early stage/i.test(text)) signals.push("Early-stage");
-        if (/series a|growth|scaling/i.test(text)) signals.push("Growth-stage");
+        if (/\b(ceo|cto|coo|executive)\b/i.test(text)) signals.push("Executive role");
+        if (/\b(engineer|developer|software)\b/i.test(text)) signals.push("Engineering");
+        if (/\b(sales|marketing|growth|business development)\b/i.test(text)) signals.push("Go-to-market");
+        if (/\b(utah|salt lake|provo|logan|ogden|lehi)\b/i.test(text)) signals.push("Utah-based");
+        if (/\b(university|student|intern|byu|usu|u of u)\b/i.test(text)) signals.push("Student / Intern");
+        if (/\b(ai|machine learning|\bml\b|computer vision)\b/i.test(text)) signals.push("AI / ML");
+        if (/\b(life science|biotech|medical|fda|510k|diagnostic)\b/i.test(text)) signals.push("Life sciences");
+        if (/\b(energy|solar|battery|cleantech|grid)\b/i.test(text)) signals.push("Energy / Cleantech");
+        if (/\b(defense|aerospace|dod|sbir|sttr)\b/i.test(text)) signals.push("Defense / Aerospace");
+        if (/\b(fractional|advisor|advisory|board)\b/i.test(text)) signals.push("Fractional / Advisory");
+        if (/\b(cyber|security|cryptography)\b/i.test(text)) signals.push("Cybersecurity");
+        if (/\b(fintech|financial|banking)\b/i.test(text)) signals.push("Fintech");
+        if (/\b(seed|pre-seed|early stage)\b/i.test(text)) signals.push("Early-stage");
+        if (/\b(series a|growth|scaling)\b/i.test(text)) signals.push("Growth-stage");
         if (signals.length === 0) signals.push("Utah innovation ecosystem");
         setExtracted(signals);
         setNormalizedData(null);
@@ -137,39 +137,39 @@ export default function IntakePage() {
       : [];
 
     if (sectors.length === 0) {
-      if (/life science|biotech|medical|fda|diagnostic|therapeutic|pharma/.test(text)) sectors.push("life_sciences");
-      if (/ai|machine learning|ml|computer vision|neural|algorithm/.test(text)) sectors.push("ai");
-      if (/defense|aerospace|military|dod|satellite/.test(text)) sectors.push("defense_aerospace");
-      if (/cyber|security|cryptography|encryption|threat/.test(text)) sectors.push("cyber");
-      if (/energy|solar|battery|grid|microgrid|renewable|power|cleantech/.test(text)) sectors.push("energy");
-      if (/manufactur|factory|production|industrial|automation|robotics/.test(text)) sectors.push("advanced_manufacturing");
-      if (/fintech|financial|banking|payment|credit|crypto/.test(text)) sectors.push("fintech");
-      if (/software|saas|app|platform|api|developer|code/.test(text)) sectors.push("software");
-      if (/clean|climate|carbon|green|sustainable|environmental|agriculture/.test(text)) sectors.push("cleantech");
+      if (/\b(life science|biotech|medical|fda|diagnostic|therapeutic|pharma)\b/.test(text)) sectors.push("life_sciences");
+      if (/\b(ai|machine learning|\bml\b|computer vision|neural|algorithm)\b/.test(text)) sectors.push("ai");
+      if (/\b(defense|aerospace|military|dod|satellite)\b/.test(text)) sectors.push("defense_aerospace");
+      if (/\b(cyber|security|cryptography|encryption|threat)\b/.test(text)) sectors.push("cyber");
+      if (/\b(energy|solar|battery|grid|microgrid|renewable|power|cleantech)\b/.test(text)) sectors.push("energy");
+      if (/\b(manufactur|factory|production|industrial|automation|robotics)\b/.test(text)) sectors.push("advanced_manufacturing");
+      if (/\b(fintech|financial|banking|payment|credit|crypto)\b/.test(text)) sectors.push("fintech");
+      if (/\b(software|saas|app|platform|api|developer|code)\b/.test(text)) sectors.push("software");
+      if (/\b(clean|climate|carbon|green|sustainable|environmental|agriculture)\b/.test(text)) sectors.push("cleantech");
     }
 
     const skills: string[] = normalizedData?.skills && (normalizedData.skills as string[]).length > 0
       ? (normalizedData.skills as string[])
       : [];
     if (skills.length === 0) {
-      if (/commercialization/.test(text)) skills.push("commercialization");
-      if (/regulatory|fda|510k|iso/.test(text)) skills.push("regulatory_strategy");
-      if (/engineering/.test(text)) skills.push("engineering");
-      if (/sales/.test(text)) skills.push("sales");
-      if (/marketing/.test(text)) skills.push("marketing");
-      if (/software|code|developer/.test(text)) skills.push("software");
-      if (/python/.test(text)) skills.push("python");
-      if (/machine learning|ml|computer vision/.test(text)) skills.push("machine_learning");
-      if (/operations|ops/.test(text)) skills.push("operations");
-      if (/strategy/.test(text)) skills.push("strategy");
-      if (/finance|financial/.test(text)) skills.push("finance");
-      if (/legal|attorney|law/.test(text)) skills.push("legal");
-      if (/patent|ip/.test(text)) skills.push("ip_strategy");
-      if (/grant|sbir|sttr/.test(text)) skills.push("grant_writing");
-      if (/management|leadership/.test(text)) skills.push("management");
-      if (/product/.test(text)) skills.push("product");
-      if (/design/.test(text)) skills.push("design");
-      if (/data|analytics/.test(text)) skills.push("data_analysis");
+      if (/\bcommercialization\b/.test(text)) skills.push("commercialization");
+      if (/\b(regulatory|fda|510k|iso)\b/.test(text)) skills.push("regulatory_strategy");
+      if (/\bengineering\b/.test(text)) skills.push("engineering");
+      if (/\bsales\b/.test(text)) skills.push("sales");
+      if (/\bmarketing\b/.test(text)) skills.push("marketing");
+      if (/\b(software|code|developer)\b/.test(text)) skills.push("software");
+      if (/\bpython\b/.test(text)) skills.push("python");
+      if (/\b(machine learning|\bml\b|computer vision)\b/.test(text)) skills.push("machine_learning");
+      if (/\boperations\b/.test(text)) skills.push("operations");
+      if (/\bstrategy\b/.test(text)) skills.push("strategy");
+      if (/\b(finance|financial)\b/.test(text)) skills.push("finance");
+      if (/\b(legal|attorney|law)\b/.test(text)) skills.push("legal");
+      if (/\b(patent|ip)\b/.test(text)) skills.push("ip_strategy");
+      if (/\b(grant|sbir|sttr)\b/.test(text)) skills.push("grant_writing");
+      if (/\b(management|leadership)\b/.test(text)) skills.push("management");
+      if (/\bproduct\b/.test(text)) skills.push("product");
+      if (/\bdesign\b/.test(text)) skills.push("design");
+      if (/\b(data|analytics)\b/.test(text)) skills.push("data_analysis");
     }
 
     const stagePreferences: Entity["stagePreferences"] = normalizedData?.stagePreferences && (normalizedData.stagePreferences as string[]).length > 0
@@ -178,13 +178,13 @@ export default function IntakePage() {
         ) as Entity["stagePreferences"]
       : [];
     if (stagePreferences.length === 0) {
-      if (/pre[-\s]?seed/.test(text)) stagePreferences.push("pre_seed");
-      if (/seed[-\s]?stage|seed stage|raising seed/.test(text)) stagePreferences.push("seed");
-      if (/series a/.test(text)) stagePreferences.push("series_a");
-      if (/growth|scaling/.test(text)) stagePreferences.push("growth");
-      if (/prototype/.test(text)) stagePreferences.push("prototype");
-      if (/idea/.test(text)) stagePreferences.push("idea");
-      if (/sbir/.test(text)) stagePreferences.push("sbir_phase_i", "sbir_phase_ii");
+      if (/\bpre[-\s]?seed\b/.test(text)) stagePreferences.push("pre_seed");
+      if (/\b(seed[-\s]?stage|seed stage|raising seed)\b/.test(text)) stagePreferences.push("seed");
+      if (/\bseries a\b/.test(text)) stagePreferences.push("series_a");
+      if (/\b(growth|scaling)\b/.test(text)) stagePreferences.push("growth");
+      if (/\bprototype\b/.test(text)) stagePreferences.push("prototype");
+      if (/\bidea\b/.test(text)) stagePreferences.push("idea");
+      if (/\bsbir\b/.test(text)) stagePreferences.push("sbir_phase_i", "sbir_phase_ii");
       if (stagePreferences.length === 0) stagePreferences.push("seed");
     }
 
@@ -192,10 +192,10 @@ export default function IntakePage() {
       ? (normalizedData.availability as Entity["availability"])
       : undefined;
     if (!availability) {
-      if (/fractional/.test(text)) availability = "fractional";
-      else if (/intern|student/.test(text)) availability = "internship";
-      else if (/advisor|advisory|board/.test(text)) availability = "advisory";
-      else if (/full[-\s]?time|co[-\s]?founder|cto|ceo|coo|vp/.test(text)) availability = "full_time";
+      if (/\bfractional\b/.test(text)) availability = "fractional";
+      else if (/\b(intern|student)\b/.test(text)) availability = "internship";
+      else if (/\b(advisor|advisory|board)\b/.test(text)) availability = "advisory";
+      else if (/\b(full[-\s]?time|co[-\s]?founder|cto|ceo|coo|vp)\b/.test(text)) availability = "full_time";
     }
 
     const institutionAffiliations: Entity["institutionAffiliations"] = normalizedData?.institutionAffiliations && (normalizedData.institutionAffiliations as string[]).length > 0
@@ -204,12 +204,12 @@ export default function IntakePage() {
         ) as Entity["institutionAffiliations"]
       : [];
     if (institutionAffiliations.length === 0) {
-      if (/university of utah|u of u/.test(text)) institutionAffiliations.push("university_of_utah");
-      if (/byu|brigham young/.test(text)) institutionAffiliations.push("brigham_young_university");
-      if (/usu|utah state/.test(text)) institutionAffiliations.push("utah_state_university");
-      if (/uvu|utah valley/.test(text)) institutionAffiliations.push("utah_valley_university");
-      if (/mit\b|massachusetts institute/.test(text)) institutionAffiliations.push("out_of_state");
-      if (/stanford|harvard|berkeley|caltech|cmu|carnegie mellon/.test(text)) institutionAffiliations.push("out_of_state");
+      if (/\b(university of utah|u of u)\b/.test(text)) institutionAffiliations.push("university_of_utah");
+      if (/\b(byu|brigham young)\b/.test(text)) institutionAffiliations.push("brigham_young_university");
+      if (/\b(usu|utah state)\b/.test(text)) institutionAffiliations.push("utah_state_university");
+      if (/\b(uvu|utah valley)\b/.test(text)) institutionAffiliations.push("utah_valley_university");
+      if (/\bmit\b|massachusetts institute/.test(text)) institutionAffiliations.push("out_of_state");
+      if (/\b(stanford|harvard|berkeley|caltech|cmu|carnegie mellon)\b/.test(text)) institutionAffiliations.push("out_of_state");
       if (institutionAffiliations.length === 0) institutionAffiliations.push("none");
     }
 
