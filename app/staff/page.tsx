@@ -27,7 +27,7 @@ export default function StaffPage() {
       }
     }
 
-    const intakes = all.filter((e) => e.id.startsWith("intake-") || e.type === "talent");
+    const intakes = all.filter((e) => e.id.startsWith("intake-"));
     const items = intakes.map((intake) => {
       const candidates = all.filter((e) => e.id !== intake.id);
       const scored = candidates

@@ -56,8 +56,6 @@ function wasInferred(entity: Entity, field: "availability" | "stagePreferences" 
     });
   }
   if (field === "missionInterests") {
-    // missionInterests is auto-filled if user mentions Utah, otherwise empty
-    // If it contains utah_ecosystem but user didn't mention Utah, it was auto-filled
     if (entity.missionInterests.includes("utah_ecosystem")) {
       return !/utah|salt lake|provo|logan|byu|usu/.test(text);
     }
@@ -71,7 +69,6 @@ function findTextualConnections(source: Entity, target: Entity): MatchReason[] {
   const reasons: MatchReason[] = [];
   const sourceText = (source.headline + " " + source.summary).toLowerCase();
 
-  // Check for manufacturing-related text alignment
   if (/manufactur|production|factory|industrial/.test(sourceText)) {
     const targetHasManufacturing = target.sectors.includes("advanced_manufacturing") ||
       target.headline.toLowerCase().includes("manufactur") ||
@@ -85,7 +82,6 @@ function findTextualConnections(source: Entity, target: Entity): MatchReason[] {
     }
   }
 
-  // Check for energy-related text alignment
   if (/energy|power|grid|battery|solar|renewable/.test(sourceText)) {
     const targetHasEnergy = target.sectors.includes("energy") ||
       target.headline.toLowerCase().includes("energy") ||
@@ -98,7 +94,6 @@ function findTextualConnections(source: Entity, target: Entity): MatchReason[] {
     }
   }
 
-  // Check for MIT/prestigious institution
   if (/mit\b|massachusetts institute|stanford|harvard|phd|masters|mba/.test(sourceText)) {
     reasons.push({
       label: "Strong academic background",
@@ -106,7 +101,6 @@ function findTextualConnections(source: Entity, target: Entity): MatchReason[] {
     });
   }
 
-  // Check for leadership/management
   if (/manager|director|lead|head|vp|coo|ceo|cto|executive/.test(sourceText)) {
     const targetNeedsLeadership = target.needs.some((n) =>
       /coo|ceo|cto|vp|director|manager|lead|executive/.test(n.description.toLowerCase())
@@ -233,6 +227,18 @@ export function buildExplanation(source: Entity, target: Entity): Omit<Match, "i
     });
   }
 
+  // Skill expertise
+  if (breakdown.skillExpertiseFit >= 7) {
+    const shared = source.skills.filter((s) => target.skills.includes(s) || target.expertise.includes(s));
+    if (shared.length > 0) {
+      reasons.push({
+        label: "Shared expertise",
+        detail: `They bring complementary capabilities in ${shared.slice(0, 3).map(formatLabel).join(", ")}, making collaboration natural.`,
+      });
+      evidence.push({ field: "shared_skills", value: shared.slice(0, 3).map(formatLabel).join(", ") });
+    }
+  }
+
   // Mission: DON'T show if it was auto-filled for everyone
   if (breakdown.missionFit >= 3 && !wasInferred(source, "missionInterests")) {
     const shared = source.missionInterests?.filter((m) => target.missionInterests?.includes(m)) || [];
@@ -257,6 +263,27 @@ export function buildExplanation(source: Entity, target: Entity): Omit<Match, "i
     gaps.push({
       label: "Sector mismatch risk",
       detail: `${source.name} focuses on ${source.sectors.map(formatLabel).join(", ")} while ${target.name} is in ${target.sectors.map(formatLabel).join(", ")}. Consider if cross-sector experience is relevant.`,
+    });
+  }
+
+  if (breakdown.availabilityFit < 5 && source.availability) {
+    gaps.push({
+      label: "Availability uncertainty",
+      detail: `${source.name} is ${formatLabel(source.availability)}, but ${target.name} may need a different engagement model.`,
+    });
+  }
+
+  if (source.needs?.length && !target.offers?.length) {
+    gaps.push({
+      label: "Unmet needs",
+      detail: `${source.name} has needs that ${target.name} may not be able to address.`,
+    });
+  }
+
+  if (target.needs?.length && !source.offers?.length) {
+    gaps.push({
+      label: "Unmet needs",
+      detail: `${target.name} has needs that ${source.name} may not be able to address.`,
     });
   }
 
